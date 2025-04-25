@@ -1,0 +1,5 @@
+flask==2.3.3
+gunicorn==22.0.0
+tensorflow==2.15.0
+tensorflowjs==4.17.0
+flask-cors==4.0.0

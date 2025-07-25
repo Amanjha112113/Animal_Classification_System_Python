@@ -20,6 +20,10 @@
       box-shadow: 0 8px 32px rgba(0,0,0,0.2);
       border: 1px solid rgba(255, 255, 255, 0.3);
     }
+   #output {
+     text-align: left;
+     line-height: 1.6;
+   }
   </style>
 </head>
 
@@ -58,86 +62,98 @@
   </footer>
 
   <script>
-    let model;
-    const imageUpload = document.getElementById('imageUpload');
-    const imagePreview = document.getElementById('imagePreview');
-    const output = document.getElementById('output');
-    const loading = document.querySelector('.loading');
-    const placeholderText = document.getElementById('placeholderText');
+  let model;
+  const imageUpload = document.getElementById('imageUpload');
+  const imagePreview = document.getElementById('imagePreview');
+  const output = document.getElementById('output');
+  const loading = document.querySelector('.loading');
+  const placeholderText = document.getElementById('placeholderText');
 
-    // Load MobileNet model
-    async function loadModel() {
-      try {
-        model = await mobilenet.load();
-        console.log('Model loaded successfully');
-      } catch (error) {
-        console.error('Error loading model:', error);
-        output.textContent = 'Error loading the model. Please refresh the page.';
-      }
+  // Load MobileNet model
+  async function loadModel() {
+    try {
+      model = await mobilenet.load();
+      console.log('Model loaded successfully');
+    } catch (error) {
+      console.error('Error loading model:', error);
+      output.textContent = 'Error loading the model. Please refresh the page.';
     }
-
-    // Handle image upload
-    imageUpload.addEventListener('change', async (e) => {
-      const file = e.target.files[0];
-      if (!file) return;
-
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        imagePreview.src = e.target.result;
-        imagePreview.classList.remove('hidden');
-        placeholderText.classList.add('hidden');
-        classifyImage(e.target.result);
-      };
-      reader.readAsDataURL(file);
-    });
-
-    // Classify image using MobileNet and get Gemini info
-    async function classifyImage(imageUrl) {
-      try {
-        loading.classList.remove('hidden');
-        output.textContent = 'Analyzing image...';
-
-        const img = new Image();
-        img.src = imageUrl;
-        await new Promise((resolve) => { img.onload = resolve; });
-
-        const predictions = await model.classify(img);
-        const topPrediction = predictions[0];
-
-        // Show initial prediction
-        output.textContent = `🐶 This looks like a ${topPrediction.className} with ${(topPrediction.probability * 100).toFixed(2)}% confidence.\n\nFetching more info...`;
-
-        // Fetch detailed info from Gemini backend
-        const detailedInfo = await fetchAnimalInfo(topPrediction.className);
-        output.textContent += `\n\n📖 About ${topPrediction.className}:\n${detailedInfo}`;
-
-      } catch (error) {
-        console.error('Error classifying image:', error);
-        output.textContent = 'Error analyzing the image. Please try again.';
-      } finally {
-        loading.classList.add('hidden');
-      }
-    }
-
-    // Fetch additional info from Gemini backend
-async function fetchAnimalInfo(animalName) {
-  try {
-    const response = await fetch('https://animal-classification-system-python.onrender.com/animal-info', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ animalName })
-    });
-    const data = await response.json();
-    return data.info;
-  } catch (error) {
-    console.error("Error fetching animal info:", error);
-    return "Could not retrieve additional information.";
   }
-}
 
+  // Handle image upload
+  imageUpload.addEventListener('change', async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
 
-    // Load model on page load
-    loadModel();
-  </script>
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      imagePreview.src = e.target.result;
+      imagePreview.classList.remove('hidden');
+      placeholderText.classList.add('hidden');
+      classifyImage(e.target.result);
+    };
+    reader.readAsDataURL(file);
+  });
+
+  // Typing effect function
+  function typeWriter(text, element, speed = 20) {
+    element.textContent = "";
+    let i = 0;
+    const timer = setInterval(() => {
+      element.textContent += text.charAt(i);
+      i++;
+      if (i > text.length) clearInterval(timer);
+    }, speed);
+  }
+
+  // Classify image using MobileNet and get Gemini info
+  async function classifyImage(imageUrl) {
+    try {
+      loading.classList.remove('hidden');
+      output.textContent = 'Analyzing image...';
+
+      const img = new Image();
+      img.src = imageUrl;
+      await new Promise((resolve) => { img.onload = resolve; });
+
+      const predictions = await model.classify(img);
+      const topPrediction = predictions[0];
+
+      const predictionText = `🐶 This looks like a ${topPrediction.className} with ${(topPrediction.probability * 100).toFixed(2)}% confidence.\n\nFetching more info...`;
+      typeWriter(predictionText, output);
+
+      // Fetch detailed info from Gemini backend
+      const detailedInfo = await fetchAnimalInfo(topPrediction.className);
+      const finalText = `${predictionText}\n\n📖 **About ${topPrediction.className}:**\n${detailedInfo}`;
+      setTimeout(() => typeWriter(finalText, output), predictionText.length * 20 + 500);
+
+    } catch (error) {
+      console.error('Error classifying image:', error);
+      output.textContent = 'Error analyzing the image. Please try again.';
+    } finally {
+      loading.classList.add('hidden');
+    }
+  }
+
+  // Fetch additional info from Gemini backend
+  async function fetchAnimalInfo(animalName) {
+    try {
+      const response = await fetch('https://animal-classification-system-python.onrender.com/animal-info', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ animalName })
+      });
+      const data = await response.json();
+      return data.info;
+    } catch (error) {
+      console.error("Error fetching animal info:", error);
+      return "Could not retrieve additional information.";
+    }
+  }
+
+  // Load model on page load
+  loadModel();
+</script>
+
 </body>
 </html>

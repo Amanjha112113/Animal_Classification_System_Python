@@ -122,7 +122,7 @@
     // Fetch additional info from Gemini backend
 async function fetchAnimalInfo(animalName) {
   try {
-    const response = await fetch('https://animal-classification-system-python.onrender.com//animal-info', {   // ✅ UPDATED
+    const response = await fetch('https://animal-classification-system-python.onrender.com/animal-info', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ animalName })

@@ -18,7 +18,19 @@ app.post("/animal-info", async (req, res) => {
   try {
     const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" }); 
 
-    const result = await model.generateContent(`Give detailed and interesting information about the animal: ${animalName}. Cover appearance, behaviour, facts.`);
+    const result = await model.generateContent(`You are an intelligent animal information system. When I provide an animal name (which can include dog breeds or general animals), respond as follows:
+
+If the animal is a **dog breed**:
+1. Name: <breed name>
+2. Total number of dog breeds worldwide (approximate count).
+3. This breed's approximate global population (or say "Data not available" if unavailable).
+4. Countries or regions where this breed is mainly found.
+
+If the animal is **not a dog**:
+1. Name: <animal name>
+2. A short simple fact about it (1-2 lines only, easy English).
+
+Animal name: ${animalName}`);
     const response = await result.response;
 
     res.json({ info: response.text() });

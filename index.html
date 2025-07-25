@@ -192,7 +192,15 @@
       await new Promise((resolve) => { img.onload = resolve; });
 
       const predictions = await model.classify(img);
+      
       const topPrediction = predictions[0];
+      if (predictedName.includes(',')) {
+      // Option 1: Take first name only (recommended)
+      //predictedName = predictedName.split(',')[0].trim();
+
+      // Or Option 2: Take last name
+      predictedName = predictedName.split(',').slice(-1)[0].trim();
+      }
 
       const predictionText = `🐶 This looks like a ${topPrediction.className} with ${(topPrediction.probability * 100).toFixed(2)}% confidence.\n\nFetching more info...`;
       typeWriter(predictionText, output);

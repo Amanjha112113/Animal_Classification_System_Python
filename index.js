@@ -26,6 +26,10 @@ app.post("/animal-info", async (req, res) => {
       ],
     });
 
+  app.get("/", (req, res) => {
+  res.send("Backend is working ✅");
+  });
+
     res.json({ info: result.text });
   } catch (error) {
     console.error(error);

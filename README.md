@@ -5,7 +5,6 @@ Website Link : https://animal-classification-system.netlify.app/
 # 📊 GitHub Stats:
 ![](https://github-readme-stats.vercel.app/api?username=amanjha112113&theme=dark&hide_border=false&include_all_commits=true&count_private=true)<br/>
 ![](https://nirzak-streak-stats.vercel.app/?user=amanjha112113&theme=dark&hide_border=false)<br/>
-![](https://github-readme-stats.vercel.app/api/top-langs/?username=amanjha112113&theme=dark&hide_border=false&include_all_commits=true&count_private=true&layout=compact)
 
 ---
 [![](https://visitcount.itsvg.in/api?id=amanjha112113&icon=0&color=0)](https://visitcount.itsvg.in)

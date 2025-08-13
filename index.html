@@ -12,6 +12,8 @@
   <!-- TensorFlow.js + MobileNet -->
   <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
   <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet"></script>
+  <!-- Marked.js for markdown parsing -->
+  <script src="https://cdn.jsdelivr.net/npm/marked@4.0.12/lib/marked.esm.js"></script>
 
   <style>
     .glass {
@@ -39,6 +41,30 @@
     }
     .sidebar-bg {
       background: linear-gradient(160deg, #6366f1 70%, #a5b4fc 100%);
+    }
+    /* Enhanced output styling */
+    #output h1, #output h2, #output h3 {
+      color: #4f46e5; /* Indigo-600 */
+      margin-top: 1rem;
+      margin-bottom: 0.5rem;
+    }
+    #output p {
+      margin-bottom: 0.75rem;
+    }
+    #output strong {
+      font-weight: 700;
+      color: #1e40af; /* Indigo-800 */
+    }
+    #output ul, #output ol {
+      margin: 0.75rem 0;
+      padding-left: 1.5rem;
+    }
+    #output li {
+      margin-bottom: 0.5rem;
+    }
+    #output .error {
+      color: #dc2626; /* Red-600 */
+      font-weight: 600;
     }
   </style>
 </head>
@@ -148,7 +174,7 @@
       console.log('Model loaded successfully');
     } catch (error) {
       console.error('Error loading model:', error);
-      output.textContent = 'Error loading the model. Please refresh the page.';
+      output.innerHTML = '<p class="error">Error loading the model. Please refresh the page.</p>';
     }
   }
 
@@ -167,16 +193,46 @@
     reader.readAsDataURL(file);
   });
 
-  // Typing effect function (optimized for speed and blocks)
-  function typeWriter(text, element, speed = 15) {
-    element.textContent = "";
+  // Modified typewriter effect to support HTML
+  function typeWriter(htmlContent, element, speed = 15) {
+    // Parse markdown to HTML
+    const formattedContent = marked.parse(htmlContent);
+    element.innerHTML = ''; // Clear existing content
     let i = 0;
+    const tempContainer = document.createElement('div');
+    tempContainer.innerHTML = formattedContent;
+    const textNodes = getTextNodes(tempContainer);
+    let currentNodeIndex = 0;
+    let currentCharIndex = 0;
+
+    function getTextNodes(node) {
+      const nodes = [];
+      const walker = document.createTreeWalker(node, NodeFilter.SHOW_TEXT, null, false);
+      let textNode;
+      while (textNode = walker.nextNode()) {
+        nodes.push(textNode);
+      }
+      return nodes;
+    }
+
     const timer = setInterval(() => {
-      element.textContent += text.charAt(i);
-      i++;
-      if (i >= text.length) clearInterval(timer);
-      // For long text, auto-scroll to bottom
-      element.scrollTop = element.scrollHeight;
+      if (currentNodeIndex >= textNodes.length) {
+        clearInterval(timer);
+        element.scrollTop = element.scrollHeight; // Auto-scroll to bottom
+        return;
+      }
+
+      const currentNode = textNodes[currentNodeIndex];
+      const parent = currentNode.parentNode.cloneNode(true);
+      parent.textContent = currentNode.textContent.slice(0, currentCharIndex + 1);
+      element.innerHTML = formattedContent.slice(0, formattedContent.indexOf(currentNode.textContent)) + parent.outerHTML;
+      
+      currentCharIndex++;
+      if (currentCharIndex >= currentNode.textContent.length) {
+        currentNodeIndex++;
+        currentCharIndex = 0;
+      }
+      element.scrollTop = element.scrollHeight; // Auto-scroll during typing
     }, speed);
   }
 
@@ -184,7 +240,7 @@
   async function classifyImage(imageUrl) {
     try {
       loading.classList.remove('hidden');
-      output.textContent = 'Analyzing image...';
+      output.innerHTML = '<p class="text-indigo-600 font-semibold">Analyzing image...</p>';
       output.scrollTop = 0;
 
       const img = new Image();
@@ -194,12 +250,9 @@
       const predictions = await model.classify(img);
       
       let topPrediction = predictions[0];
-      /*if (topPrediction.includes(',')) {
-      // Option 1: Take first name only (recommended)
-      //topPrediction = topPrediction.split(',')[0].trim();
-
-      // Or Option 2: Take last name
-      topPrediction = topPrediction.split(',').slice(-1)[0].trim();
+      /*if (topPrediction.className.includes(',')) {
+        // Option 1: Take first name only
+        topPrediction.className = topPrediction.className.split(',')[0].trim();
       }*/
 
       const predictionText = `🐶 This looks like a ${topPrediction.className} with ${(topPrediction.probability * 100).toFixed(2)}% confidence.\n\nFetching more info...`;
@@ -212,7 +265,7 @@
 
     } catch (error) {
       console.error('Error classifying image:', error);
-      output.textContent = 'Error analyzing the image. Please try again.';
+      output.innerHTML = '<p class="error">Error analyzing the image. Please try again.</p>';
     } finally {
       loading.classList.add('hidden');
     }

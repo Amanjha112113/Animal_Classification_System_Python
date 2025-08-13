@@ -15,6 +15,67 @@
 
 <style>
 .glass {
+      background: rgba(255, 255, 255, 0.25);
+      border-radius: 24px;
+      backdrop-filter: blur(14px);
+      box-shadow: 0 12px 48px rgba(60,20,120,0.09);
+      border: 1px solid rgba(255, 255, 255, 0.5);
+      transition: box-shadow 0.2s;
+    }
+    .output-scroll {
+      max-height: 430px;
+      min-height: 280px;
+      overflow-y: auto;
+      scrollbar-width: thin;
+      scrollbar-color: #6366f1 #f3f4f6;
+    }
+    .output-scroll::-webkit-scrollbar {
+      width: 8px;
+      background: #f3f4f6;
+    }
+    .output-scroll::-webkit-scrollbar-thumb {
+      background: #6366f1;
+      border-radius: 8px;
+    }
+    .sidebar-bg {
+      background: linear-gradient(160deg, #6366f1 70%, #a5b4fc 100%);
+    }
+    /* Enhanced output styling */
+    #output h1, #output h2, #output h3 {
+      color: #4f46e5; /* Indigo-600 */
+      margin-top: 1rem;
+      margin-bottom: 0.5rem;
+      font-weight: 700;
+    }
+    #output p {
+      margin-bottom: 0.75rem;
+      color: #1e40af; /* Indigo-800 */
+    }
+    #output strong {
+      font-weight: 700;
+      color: #1e40af; /* Indigo-800 */
+    }
+    #output ul, #output ol {
+      margin: 0.75rem 0;
+      padding-left: 1.5rem;
+      color: #1e40af; /* Indigo-800 */
+    }
+    #output li {
+      margin-bottom: 0.5rem;
+    }
+    #output .error {
+      color: #dc2626; /* Red-600 */
+      font-weight: 600;
+    }
+    #output {
+      line-height: 1.6;
+    }
+    #output .emoji {
+      font-size: 1.2em;
+      margin-right: 0.5rem;
+    }
+/*
+.glass {
 background: rgba(255, 255, 255, 0.25);
 border-radius: 24px;
 backdrop-filter: blur(14px);
@@ -39,7 +100,8 @@ border-radius: 8px;
 }
 .sidebar-bg {
 background: linear-gradient(160deg, #6366f1 70%, #a5b4fc 100%);
-}
+}*/
+  
 </style>
 </head>
 
